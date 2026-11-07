@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id           Int       @id @default(autoincrement())
+  nome         String
+  email        String    @unique
+  senha        String
+  dataCadastro DateTime  @default(now())
+  locacoes     Locacao[]
+
+  @@map("usuarios")
+}
+
+model Veiculo {
+  id              Int       @id @default(autoincrement())
+  marca           String
+  modelo          String
+  placa           String    @unique
+  ano             Int
+  valorDiaria     Float
+  disponibilidade Boolean   @default(true)
+  locacoes        Locacao[]
+
+  @@map("veiculos")
+}
+
+model Locacao {
+  id                    Int       @id @default(autoincrement())
+  usuarioId             Int
+  veiculoId             Int
+  dataInicio            DateTime
+  dataPrevistaDevolucao DateTime
+  dataEfetivaDevolucao  DateTime?
+  valorTotal            Float
+  status                String    @default("ATIVA")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  veiculo Veiculo @relation(fields: [veiculoId], references: [id])
+
+  @@map("locacoes")
+}
